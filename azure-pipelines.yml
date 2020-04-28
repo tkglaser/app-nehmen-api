@@ -32,4 +32,5 @@ stages:
         dockerfile: '$(Build.SourcesDirectory)/Dockerfile'
         repository: tkglaser/app-nehmen-api
         tags: |
+          latest
           $(tag)
