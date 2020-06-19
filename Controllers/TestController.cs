@@ -19,9 +19,13 @@ namespace app_nehmen_api.Controllers
         }
 
         [HttpGet]
-        public string Get()
+        public object Get()
         {
-            return $"Success {DateTime.Now.ToString()}";
+            return new
+            {
+                success = true,
+                timestamp = DateTime.Now.ToString()
+            };
         }
     }
 }
