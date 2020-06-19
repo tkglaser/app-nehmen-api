@@ -44,8 +44,6 @@ namespace app_nehmen_api
 
             app.UseAuthorization();
 
-            app.UsePathBase("/api/v1");
-
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
