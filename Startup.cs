@@ -35,12 +35,16 @@ namespace app_nehmen_api
             {
                 app.UseDeveloperExceptionPage();
             }
-
-            app.UseHttpsRedirection();
+            else
+            {
+                app.UseHttpsRedirection();
+            }
 
             app.UseRouting();
 
             app.UseAuthorization();
+
+            app.UsePathBase("/api/v1");
 
             app.UseEndpoints(endpoints =>
             {
