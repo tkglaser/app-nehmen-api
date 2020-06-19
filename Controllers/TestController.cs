@@ -29,7 +29,7 @@ namespace app_nehmen_api.Controllers
             {
                 success = true,
                 timestamp = DateTime.Now.ToString(),
-                config = _config
+                // config = _config
             };
         }
     }
