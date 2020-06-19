@@ -49,5 +49,26 @@ namespace app_nehmen_api
                 endpoints.MapControllers();
             });
         }
+
+        /// <summary>
+        /// Creates a Cosmos DB database and a container with the specified partition key. 
+        /// </summary>
+        /// <returns></returns>
+        // private static async Task<CosmosDbService> InitializeCosmosClientInstanceAsync(IConfigurationSection configurationSection)
+        // {
+        //     string databaseName = configurationSection.GetSection("DatabaseName").Value;
+        //     string containerName = configurationSection.GetSection("ContainerName").Value;
+        //     string account = configurationSection.GetSection("Account").Value;
+        //     string key = configurationSection.GetSection("Key").Value;
+        //     Microsoft.Azure.Cosmos.Fluent.CosmosClientBuilder clientBuilder = new Microsoft.Azure.Cosmos.Fluent.CosmosClientBuilder(account, key);
+        //     Microsoft.Azure.Cosmos.CosmosClient client = clientBuilder
+        //                         .WithConnectionModeDirect()
+        //                         .Build();
+        //     CosmosDbService cosmosDbService = new CosmosDbService(client, databaseName, containerName);
+        //     Microsoft.Azure.Cosmos.DatabaseResponse database = await client.CreateDatabaseIfNotExistsAsync(databaseName);
+        //     await database.Database.CreateContainerIfNotExistsAsync(containerName, "/id");
+
+        //     return cosmosDbService;
+        // }
     }
 }
