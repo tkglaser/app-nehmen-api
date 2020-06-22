@@ -27,8 +27,8 @@ namespace app_nehmen_api
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.Configure<CosmosConfig>(Configuration.GetSection(CosmosConfig.CosmosDb));
-            services.AddSingleton<ICosmosDbService>(InitializeCosmosClientInstanceAsync(Configuration.GetSection("CosmosDb")).GetAwaiter().GetResult());
+            var cosmosConfig = Configuration.GetSection(CosmosConfig.CosmosDb).Get<CosmosConfig>();
+            services.AddSingleton<ICosmosDbService>(InitializeCosmosClientInstanceAsync(cosmosConfig).GetAwaiter().GetResult());
             services.AddControllers();
         }
 
@@ -58,19 +58,15 @@ namespace app_nehmen_api
         /// Creates a Cosmos DB database and a container with the specified partition key. 
         /// </summary>
         /// <returns></returns>
-        private static async Task<CosmosDbService> InitializeCosmosClientInstanceAsync(IConfigurationSection configurationSection)
+        private static async Task<CosmosDbService> InitializeCosmosClientInstanceAsync(CosmosConfig cosmosConfig)
         {
-            string databaseName = configurationSection.GetSection("DatabaseName").Value;
-            string containerName = configurationSection.GetSection("ContainerName").Value;
-            string account = configurationSection.GetSection("Account").Value;
-            string key = configurationSection.GetSection("Key").Value;
-            Microsoft.Azure.Cosmos.Fluent.CosmosClientBuilder clientBuilder = new Microsoft.Azure.Cosmos.Fluent.CosmosClientBuilder(account, key);
-            Microsoft.Azure.Cosmos.CosmosClient client = clientBuilder
+            var clientBuilder = new Microsoft.Azure.Cosmos.Fluent.CosmosClientBuilder(cosmosConfig.Account, cosmosConfig.Key);
+            var client = clientBuilder
                                 .WithConnectionModeDirect()
                                 .Build();
-            CosmosDbService cosmosDbService = new CosmosDbService(client, databaseName, containerName);
-            Microsoft.Azure.Cosmos.DatabaseResponse database = await client.CreateDatabaseIfNotExistsAsync(databaseName);
-            await database.Database.CreateContainerIfNotExistsAsync(containerName, "/pk");
+            var cosmosDbService = new CosmosDbService(client, cosmosConfig.DatabaseName, cosmosConfig.ContainerName);
+            var database = await client.CreateDatabaseIfNotExistsAsync(cosmosConfig.DatabaseName);
+            await database.Database.CreateContainerIfNotExistsAsync(cosmosConfig.ContainerName, "/pk");
 
             return cosmosDbService;
         }

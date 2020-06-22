@@ -11,34 +11,30 @@ using Microsoft.Extensions.Options;
 namespace app_nehmen_api.Controllers
 {
     [ApiController]
-    [Route("api/v1/test")]
-    public class TestController : ControllerBase
+    [Route("api/v1/data")]
+    public class DataController : ControllerBase
     {
-        private readonly ILogger<TestController> _logger;
-        private readonly IOptions<CosmosConfig> _config;
+        private readonly ILogger<DataController> _logger;
         private readonly ICosmosDbService _cosmosDbService;
 
-        public TestController(
-            ILogger<TestController> logger,
+        public DataController(
+            ILogger<DataController> logger,
             IOptions<CosmosConfig> config,
             ICosmosDbService cosmosDbService)
         {
             _logger = logger;
-            _config = config;
             _cosmosDbService = cosmosDbService;
         }
 
-        [HttpGet]
+        [HttpGet("token")]
         public async Task<object> Get([FromQuery] string userId)
         {
             var token = await _cosmosDbService.GetResourceToken(userId);
             return new
             {
-                success = true,
                 timestamp = DateTime.Now.ToString(),
                 userId = userId,
                 token = token
-                // config = _config
             };
         }
     }
