@@ -1,3 +1,4 @@
+using System.Net;
 using System.Threading.Tasks;
 using Microsoft.Azure.Cosmos;
 
@@ -19,14 +20,51 @@ namespace app_nehmen_api.Services
 
         public async Task<string> GetResourceToken(string userid)
         {
-            var user = await _database.CreateUserAsync(userid);
+            User user;
+            try
+            {
+                var userResponse = await _database.CreateUserAsync(userid);
+                user = userResponse.User;
+            }
+            catch (CosmosException ex)
+            {
+                if (ex.StatusCode == HttpStatusCode.Conflict)
+                {
+                    user = _database.GetUser(userid);
+                }
+                else
+                {
+                    throw;
+                }
+            }
+            
             var permissionId = $"permission{userid}";
-            var permission = await user.User.CreatePermissionAsync(new PermissionProperties(
-                id: permissionId,
-                permissionMode: PermissionMode.All,
-                container: _container,
-                resourcePartitionKey: new PartitionKey(userid)));
-            return permission.Resource.Token;
+
+            PermissionProperties properties;
+
+            try
+            {
+                var permissionResponse = await user.CreatePermissionAsync(new PermissionProperties(
+                    id: permissionId,
+                    permissionMode: PermissionMode.All,
+                    container: _container,
+                    resourcePartitionKey: new PartitionKey(userid)));
+                properties = permissionResponse.Resource;
+            }
+            catch (CosmosException ex)
+            {
+                if (ex.StatusCode == HttpStatusCode.Conflict)
+                {
+                    var existingPermissionResponse = await user.GetPermission(permissionId).ReadAsync();
+                    properties = existingPermissionResponse.Resource;
+                }
+                else
+                {
+                    throw;
+                }
+            }
+
+            return properties.Token;
         }
     }
 }
