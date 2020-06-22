@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using app_nehmen_api.Models;
+using app_nehmen_api.Services;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
@@ -27,6 +28,7 @@ namespace app_nehmen_api
         public void ConfigureServices(IServiceCollection services)
         {
             services.Configure<CosmosConfig>(Configuration.GetSection(CosmosConfig.CosmosDb));
+            services.AddSingleton<ICosmosDbService>(InitializeCosmosClientInstanceAsync(Configuration.GetSection("CosmosDb")).GetAwaiter().GetResult());
             services.AddControllers();
         }
 
@@ -56,21 +58,21 @@ namespace app_nehmen_api
         /// Creates a Cosmos DB database and a container with the specified partition key. 
         /// </summary>
         /// <returns></returns>
-        // private static async Task<CosmosDbService> InitializeCosmosClientInstanceAsync(IConfigurationSection configurationSection)
-        // {
-        //     string databaseName = configurationSection.GetSection("DatabaseName").Value;
-        //     string containerName = configurationSection.GetSection("ContainerName").Value;
-        //     string account = configurationSection.GetSection("Account").Value;
-        //     string key = configurationSection.GetSection("Key").Value;
-        //     Microsoft.Azure.Cosmos.Fluent.CosmosClientBuilder clientBuilder = new Microsoft.Azure.Cosmos.Fluent.CosmosClientBuilder(account, key);
-        //     Microsoft.Azure.Cosmos.CosmosClient client = clientBuilder
-        //                         .WithConnectionModeDirect()
-        //                         .Build();
-        //     CosmosDbService cosmosDbService = new CosmosDbService(client, databaseName, containerName);
-        //     Microsoft.Azure.Cosmos.DatabaseResponse database = await client.CreateDatabaseIfNotExistsAsync(databaseName);
-        //     await database.Database.CreateContainerIfNotExistsAsync(containerName, "/id");
+        private static async Task<CosmosDbService> InitializeCosmosClientInstanceAsync(IConfigurationSection configurationSection)
+        {
+            string databaseName = configurationSection.GetSection("DatabaseName").Value;
+            string containerName = configurationSection.GetSection("ContainerName").Value;
+            string account = configurationSection.GetSection("Account").Value;
+            string key = configurationSection.GetSection("Key").Value;
+            Microsoft.Azure.Cosmos.Fluent.CosmosClientBuilder clientBuilder = new Microsoft.Azure.Cosmos.Fluent.CosmosClientBuilder(account, key);
+            Microsoft.Azure.Cosmos.CosmosClient client = clientBuilder
+                                .WithConnectionModeDirect()
+                                .Build();
+            CosmosDbService cosmosDbService = new CosmosDbService(client, databaseName, containerName);
+            Microsoft.Azure.Cosmos.DatabaseResponse database = await client.CreateDatabaseIfNotExistsAsync(databaseName);
+            await database.Database.CreateContainerIfNotExistsAsync(containerName, "/pk");
 
-        //     return cosmosDbService;
-        // }
+            return cosmosDbService;
+        }
     }
 }
