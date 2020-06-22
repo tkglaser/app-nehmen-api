@@ -23,12 +23,13 @@ namespace app_nehmen_api.Controllers
         }
 
         [HttpGet]
-        public object Get()
+        public object Get([FromQuery] string userId)
         {
             return new
             {
                 success = true,
                 timestamp = DateTime.Now.ToString(),
+                userId = userId
                 // config = _config
             };
         }
