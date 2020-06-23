@@ -28,9 +28,11 @@ namespace app_nehmen_api.Middleware
 
         protected override async Task<AuthenticateResult> HandleAuthenticateAsync()
         {
+            Console.WriteLine("Auth begins");
             if (!Request.Headers.ContainsKey("Authorization"))
                 return AuthenticateResult.Fail("Missing Authorization Header");
 
+            Console.WriteLine("Header present");
             try
             {
                 var authHeader = AuthenticationHeaderValue.Parse(Request.Headers["Authorization"]);
@@ -41,19 +43,24 @@ namespace app_nehmen_api.Middleware
 
                 if (username != _userConfig.Username || password != _userConfig.Password)
                 {
+                    Console.WriteLine("Username or password incorrect");
                     return AuthenticateResult.Fail("Username or password incorrect");
                 }
             }
             catch
             {
+                Console.WriteLine("Invalid Authorization Header");
                 return AuthenticateResult.Fail("Invalid Authorization Header");
             }
 
-            var claims = new Claim[] { };
+            var claims = new Claim[] {
+                new Claim(ClaimTypes.Name, "ApiUser")
+            };
             var identity = new ClaimsIdentity(claims, Scheme.Name);
             var principal = new ClaimsPrincipal(identity);
             var ticket = new AuthenticationTicket(principal, Scheme.Name);
 
+            Console.WriteLine("Auth ends successfully");
             return AuthenticateResult.Success(ticket);
         }
     }
