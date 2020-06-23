@@ -44,10 +44,6 @@ namespace app_nehmen_api
             {
                 app.UseDeveloperExceptionPage();
             }
-            else
-            {
-                app.UseHttpsRedirection();
-            }
 
             app.UseRouting();
 
