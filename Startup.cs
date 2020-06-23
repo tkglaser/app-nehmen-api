@@ -47,6 +47,8 @@ namespace app_nehmen_api
 
             app.UseRouting();
 
+            app.UseAuthentication();
+            
             app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>
