@@ -31,7 +31,7 @@ namespace app_nehmen_api
         {
             var cosmosConfig = Configuration.GetSection(CosmosConfig.CosmosDb).Get<CosmosConfig>();
             services.AddSingleton<ICosmosDbService>(InitializeCosmosClientInstanceAsync(cosmosConfig).GetAwaiter().GetResult());
-            services.AddOptions<UserConfig>(UserConfig.User);
+            services.Configure<UserConfig>(Configuration.GetSection(UserConfig.User));
             services.AddControllers();
             services.AddAuthentication("BasicAuthentication")
                 .AddScheme<AuthenticationSchemeOptions, BasicAuthenticationHandler>("BasicAuthentication", null);
@@ -48,7 +48,7 @@ namespace app_nehmen_api
             app.UseRouting();
 
             app.UseAuthentication();
-            
+
             app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>
