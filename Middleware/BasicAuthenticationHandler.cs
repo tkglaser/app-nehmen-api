@@ -44,6 +44,8 @@ namespace app_nehmen_api.Middleware
                 if (username != _userConfig.Username || password != _userConfig.Password)
                 {
                     Logger.LogInformation("Username or password incorrect");
+                    Logger.LogInformation($"Received [{username}] / [{password}]");
+                    Logger.LogInformation($"Expected [{_userConfig.Username}] / [{_userConfig.Password}]");
                     return AuthenticateResult.Fail("Username or password incorrect");
                 }
             }
