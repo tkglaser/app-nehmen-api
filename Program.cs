@@ -21,11 +21,17 @@ namespace app_nehmen_api
 
         public static IHostBuilder CreateHostBuilder(string[] args) =>
             Host.CreateDefaultBuilder(args)
-                .ConfigureLogging(logging =>
-                {
-                    logging.ClearProviders();
-                    logging.AddConsole();
-                })
+                .ConfigureLogging(logging => 
+                    logging
+                        .ClearProviders()
+                        .AddDebug()
+                        .AddConsole(opts => 
+                        {
+                            opts.IncludeScopes = true;
+                            opts.DisableColors = true;
+                        })
+                        .SetMinimumLevel(LogLevel.Information)
+                )
                 .ConfigureAppConfiguration((context, config) =>
                 {
                     if (context.HostingEnvironment.IsProduction())
