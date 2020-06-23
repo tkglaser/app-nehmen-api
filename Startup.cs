@@ -2,8 +2,10 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using app_nehmen_api.Middleware;
 using app_nehmen_api.Models;
 using app_nehmen_api.Services;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
@@ -29,7 +31,10 @@ namespace app_nehmen_api
         {
             var cosmosConfig = Configuration.GetSection(CosmosConfig.CosmosDb).Get<CosmosConfig>();
             services.AddSingleton<ICosmosDbService>(InitializeCosmosClientInstanceAsync(cosmosConfig).GetAwaiter().GetResult());
+            services.AddOptions<UserConfig>(UserConfig.User);
             services.AddControllers();
+            services.AddAuthentication("BasicAuthentication")
+                .AddScheme<AuthenticationSchemeOptions, BasicAuthenticationHandler>("BasicAuthentication", null);
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

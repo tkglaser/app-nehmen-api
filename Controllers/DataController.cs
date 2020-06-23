@@ -4,12 +4,14 @@ using System.Linq;
 using System.Threading.Tasks;
 using app_nehmen_api.Models;
 using app_nehmen_api.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
 namespace app_nehmen_api.Controllers
 {
+    [Authorize]
     [ApiController]
     [Route("api/v1/data")]
     public class DataController : ControllerBase
