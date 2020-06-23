@@ -11,7 +11,7 @@ using Microsoft.Extensions.Options;
 
 namespace app_nehmen_api.Controllers
 {
-    // [Authorize]
+    [Authorize]
     [ApiController]
     [Route("api/v1/data")]
     public class DataController : ControllerBase
