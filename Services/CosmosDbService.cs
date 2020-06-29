@@ -20,43 +20,56 @@ namespace app_nehmen_api.Services
 
         public async Task<string> GetResourceToken(string userid)
         {
+            var user = await GetOrCreateUser(userid);
+            var permission = await GetOrCreatePermission(user);
+            return permission.Token;
+        }
+
+        private async Task<User> GetOrCreateUser(string userid)
+        {
             User user;
+
             try
             {
-                var userResponse = await _database.CreateUserAsync(userid);
+                var userResponse = await _database.GetUser(userid).ReadAsync();
                 user = userResponse.User;
             }
-            catch (CosmosException ex)
+            catch (CosmosException x)
             {
-                if (ex.StatusCode == HttpStatusCode.Conflict)
+                if (x.StatusCode == HttpStatusCode.NotFound)
                 {
-                    user = _database.GetUser(userid);
+                    var userResponse = await _database.CreateUserAsync(userid);
+                    user = userResponse.User;
                 }
                 else
                 {
                     throw;
-                }
+                };
             }
-            
-            var permissionId = $"permission{userid}";
 
-            PermissionProperties properties;
+            return user;
+        }
+
+        private async Task<PermissionProperties> GetOrCreatePermission(User user)
+        {
+            PermissionProperties permission;
+            var permissionId = $"permission{user.Id}";
 
             try
             {
-                var permissionResponse = await user.CreatePermissionAsync(new PermissionProperties(
-                    id: permissionId,
-                    permissionMode: PermissionMode.All,
-                    container: _container,
-                    resourcePartitionKey: new PartitionKey(userid)));
-                properties = permissionResponse.Resource;
+                var permissionResponse = await user.GetPermission(permissionId).ReadAsync();
+                permission = permissionResponse.Resource;
             }
-            catch (CosmosException ex)
+            catch (CosmosException x)
             {
-                if (ex.StatusCode == HttpStatusCode.Conflict)
+                if (x.StatusCode == HttpStatusCode.NotFound)
                 {
-                    var existingPermissionResponse = await user.GetPermission(permissionId).ReadAsync();
-                    properties = existingPermissionResponse.Resource;
+                    var permissionResponse = await user.CreatePermissionAsync(new PermissionProperties(
+                        id: permissionId,
+                        permissionMode: PermissionMode.All,
+                        container: _container,
+                        resourcePartitionKey: new PartitionKey(user.Id)));
+                    permission = permissionResponse.Resource;
                 }
                 else
                 {
@@ -64,7 +77,7 @@ namespace app_nehmen_api.Services
                 }
             }
 
-            return properties.Token;
+            return permission;
         }
     }
 }
